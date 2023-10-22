@@ -27,9 +27,9 @@ const BookForm = () => {
 
     const [createBook] = useMutation(CREATE_BOOK, {
         refetchQueries:  [{query:ALL_AUTHORS}, {query:ALL_BOOKS}],
-        onError: (error) => {
-            
-        }
+        // onError: (error) => {
+
+        // }
     })
 
     const addGenre = (event) => {
@@ -49,31 +49,34 @@ const BookForm = () => {
     }
 
     return (
-        <form style={styles.gridContainer} onSubmit={addBook}>
-            {/* Three columns */}
+        <div>
+            <h1>Add Book</h1>
+            <form style={styles.gridContainer} onSubmit={addBook}>
+                {/* Three columns */}
 
-            <BookFormItem itemName={"Title"} itemValue={title} setItemValue={setTitle} />
-            <BookFormItem itemName={"Author"} itemValue={author} setItemValue={setAuthor} />
-            <BookFormItem itemName={"Published year"} itemValue={published} setItemValue={setPublished} />
-            
-            <div></div>
-            <div>
-                <input value={newGenre} onChange={({target}) => setNewGenre(target.value)} />
-            </div>
-            <input type="submit" value="add genre" onClick={addGenre} />
+                <BookFormItem itemName={"Title"} itemValue={title} setItemValue={setTitle} />
+                <BookFormItem itemName={"Author"} itemValue={author} setItemValue={setAuthor} />
+                <BookFormItem itemName={"Published year"} itemValue={published} setItemValue={setPublished} />
+                
+                <div></div>
+                <div style={styles.gridItem}>
+                    <input value={newGenre} onChange={({target}) => setNewGenre(target.value)} />
+                </div>
+                <input type="submit" value="add genre" onClick={addGenre} style={styles.gridItem}/>
 
-            <div style={{...styles.gridItem, textAlign: "right"}}>Genres:</div>
-            <div style={{...styles.gridItem, textAlign: "left"}}>
-                {genres.map(genre => <span key={genre}>{genre} </span>)}
-            </div>
-            <div></div>
+                <div style={{...styles.gridItem, textAlign: "right"}}>Genres:</div>
+                <div style={{...styles.gridItem, textAlign: "left"}}>
+                    {genres.map(genre => <span key={genre}>{genre} </span>)}
+                </div>
+                <div></div>
 
-            <div></div>
-            <button style={{backgroundColor: 'orange'}} type="submit">
-                Create book
-            </button>
-            
-        </form>
+                <div></div>
+                <button style={{backgroundColor: 'orange'}} type="submit">
+                    Create book
+                </button>
+                
+            </form>
+        </div>
     )
 }
 
