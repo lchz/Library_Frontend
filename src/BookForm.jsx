@@ -18,7 +18,7 @@ const BookFormItem = ({itemName, itemValue, setItemValue}) => {
     )
 }
 
-const BookForm = () => {
+const BookForm = ({setError}) => {
     const [title, setTitle] = useState('')
     const [author, setAuthor] = useState('')
     const [published, setPublished] = useState('')
@@ -27,21 +27,29 @@ const BookForm = () => {
 
     const [createBook] = useMutation(CREATE_BOOK, {
         refetchQueries:  [{query:ALL_AUTHORS}, {query:ALL_BOOKS}],
-        // onError: (error) => {
-
-        // }
+        onError: (error) => {
+            const msg = error.graphQLErrors.map(e => e.message).join('\n')
+            setError(msg)
+        }
     })
 
     const addGenre = (event) => {
         event.preventDefault()
+        if (newGenre === '') {
+            setError('Genre cannot be empty')
+        }
         setGenres(genres.concat(newGenre))
         setNewGenre('')
     }
     const addBook = (event) => {
         event.preventDefault()
 
-        createBook({variables: {title, author, published:parseInt(published), genres}})
+        if (!title || !author || !Number(published) || genres.length===0) {
+            setError('Required field is empty or not correct')
+            return
+        }
 
+        createBook({variables: {title, author, published:parseInt(published), genres}})
         setTitle('')
         setAuthor('')
         setPublished('')

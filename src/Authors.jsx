@@ -16,20 +16,25 @@ const Author = ({author}) => {
     )
 }
 
-const BirthyearForm = ({authorNames}) => {
+const BirthyearForm = ({authorNames, setError}) => {
     const [name, setName] = useState(authorNames[0])
     const [year, setYear] = useState('')
 
     const [updateAuthor] = useMutation(UPDATE_AUTHOR, {
         refetchQueries: [{query: ALL_AUTHORS}],
-        // onError: (error) => {
-
-        // }
+        onError: (error) => {
+            const msg = error.graphQLErrors.map(e => e.message()).join('\n')
+            setError(msg)
+        }
     })
 
     const submitYear = (event) => {
         event.preventDefault()
         // console.log('auth name:', name, 'born:', year)
+        if (!Number(year)) {
+            setError('Birthyear is not correct')
+            return
+        }
         updateAuthor({variables: {name, setBornTo: Number(year)}})
         setYear('')
     }
@@ -65,7 +70,7 @@ const BirthyearForm = ({authorNames}) => {
     )
 }
 
-const Authors = () => {
+const Authors = ({setError}) => {
 
     const result = useQuery(ALL_AUTHORS)
     if (result.loading) {
@@ -91,7 +96,7 @@ const Authors = () => {
                 }
             </div>
             
-            <BirthyearForm authorNames={authors.map(a => a.name)} />
+            <BirthyearForm authorNames={authors.map(a => a.name)} setError={setError} />
         </div>
     )
 }
