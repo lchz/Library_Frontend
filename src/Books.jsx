@@ -1,26 +1,14 @@
 import { useQuery } from "@apollo/client"
 import { ALL_BOOKS } from "./queries"
+import { styles } from "./styleSheet"
 
-const styles = {
-    gridContainer: {
-        display:"grid", 
-        gridTemplateColumns:"auto auto auto", 
-        backgroundColor:"lightBlue", 
-        padding: 10
-    },
-    gridItem: {
-        textAlign:"center", 
-        padding: 10,
-        // backgroundColor: "red"
-    }
-}
 
 const Book = ({book}) => {
     return (
         <>
-            <div key={book.id} style={{...styles.gridItem, textAlign:"left"}}>{book.title}</div>
-            <div key={book.id} style={styles.gridItem}>{book.author}</div>
-            <div key={book.id} style={styles.gridItem}>{book.published}</div>
+            <div style={{...styles.gridItem, textAlign:"left"}}>{book.title}</div>
+            <div style={styles.gridItem}>{book.author}</div>
+            <div style={styles.gridItem}>{book.published}</div>
         </>
     )
 }
