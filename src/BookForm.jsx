@@ -2,7 +2,6 @@ import { useState } from "react"
 import { styles } from "./styleSheet"
 import { useMutation } from "@apollo/client"
 import { ALL_AUTHORS, ALL_BOOKS, CREATE_BOOK } from "./queries"
-import { useEffect } from "react"
 import { Navigate } from "react-router-dom"
 
 
@@ -42,6 +41,7 @@ const BookForm = ({setError, setNotice}) => {
     })
 
     // console.log('form result:', result)
+    console.log('Genres:', genres)
 
     const addGenre = (event) => {
         event.preventDefault()
@@ -51,9 +51,15 @@ const BookForm = ({setError, setNotice}) => {
         setGenres(genres.concat(newGenre))
         setNewGenre('')
     }
+    
     const addBook = (event) => {
         event.preventDefault()
         // console.log(title, author, published, genres)
+        if (genres.length === 0) {
+            setError('Add genres first')
+            return
+        }
+
         createBookQL({variables: {title, authorName:author, published:parseInt(published), genres}})
         
         setTitle('')

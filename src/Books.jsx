@@ -1,6 +1,7 @@
 import { useQuery } from "@apollo/client"
 import { ALL_BOOKS } from "./queries"
 import { styles } from "./styleSheet"
+import { useState } from "react"
 
 
 const Book = ({book}) => {
@@ -15,18 +16,39 @@ const Book = ({book}) => {
 }
 
 const Books = () => {
-    
-    const result = useQuery(ALL_BOOKS)
+    // console.log('books token:', localStorage.getItem('library-user-token'))
+    const [genre, setGenre] = useState('')
 
-    if (result.loading) {
+    const result = useQuery(ALL_BOOKS, {
+        variables: {genre: genre==='all' ? '' : genre},
+        onError: (error) => {
+            console.log('Books error:', error.message)
+        }
+    })
+
+    const tempResult = useQuery(ALL_BOOKS)
+
+    if (result.loading || tempResult.loading) {
         return <div>Loading...</div>
     }
 
     const books = result.data.allBooks
 
+    const allBooks = tempResult.data.allBooks
+    const genreList = ["all", ...new Set( allBooks.flatMap(b => b.genres) ) ]
+
+    // console.log('list:', genreList)
+    console.log('seleted:', genre)
+
     return (
         <div>
             <h1>Books</h1>
+
+            <div>
+                in genre <span style={{fontWeight: 'bold'}}>
+                            {genre ? genre : 'all'}
+                         </span>
+            </div>
 
             <div style={styles.gridContainer}>
                 <div style={{}}></div>
@@ -34,9 +56,15 @@ const Books = () => {
                 <div style={{...styles.gridItem, fontWeight:"bold"}}>Published</div>
 
                 {
-                    books.map(book => 
+                    books.map(book =>
                         <Book key={book.id} book={book} />
                     )
+                }
+            </div>
+
+            <div>
+                {
+                    genreList.map(g => <input key={g} type="button" value={g} onClick={({target}) => setGenre(target.value)} />)
                 }
             </div>
         </div>

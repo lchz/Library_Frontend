@@ -10,6 +10,9 @@ import { useState } from 'react'
 import { useEffect } from 'react'
 import LoginForm from './LoginForm'
 
+import {jwtDecode} from 'jwt-decode'
+
+
 
 function App() {
   const [notice, setNotice] = useState('')
@@ -34,18 +37,31 @@ function App() {
   }
 
   console.log('Token:', token)
-  // console.log('storage', localStorage)
+
+  // setTimeout(() => {
+  //   console.log('Checking token')
+  //   if(!token) {
+  //     console.log('Token expired')
+  //     setToken(null)
+  //     localStorage.clear()
+  //     client.resetStore()
+  
+  //   }
+  // }, 2000);
 
   return (
     <>
       <BrowserRouter>
         <div>
+          
           <div style={{backgroundColor:'red'}}>
             {error}
           </div>
+
           <div style={{backgroundColor:'lightgreen'}}>
             {notice}
           </div>
+
           <Link to="/" style={{padding:5}}>Home</Link>
           <Link to="/authors" style={{padding:5}}>Authors</Link>
           <Link to="/books" style={{padding:5}}>Books</Link>

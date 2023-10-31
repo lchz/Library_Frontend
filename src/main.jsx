@@ -3,11 +3,14 @@ import App from './App.jsx'
 import './index.css'
 import { ApolloClient, ApolloProvider, InMemoryCache, createHttpLink } from '@apollo/client'
 import {setContext} from '@apollo/client/link/context'
+import {jwtDecode} from 'jwt-decode'
+// import Books from './Books.jsx'
+// import Authors from './Authors.jsx'
 
 
 const authLink = setContext(( _, {headers} ) => {
   const token = localStorage.getItem('library-user-token')
-  // console.log('main token:', token)
+  console.log('main token:', token)
   return {
     headers: {
       ...headers,
@@ -28,5 +31,6 @@ const client = new ApolloClient({
 ReactDOM.createRoot(document.getElementById('root')).render(
   <ApolloProvider client={client}>
     <App />
+    {/* <Books /> */}
   </ApolloProvider>
 )
