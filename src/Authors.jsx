@@ -76,7 +76,7 @@ const Authors = ({setError}) => {
     if (result.loading) {
         return <div>Loading</div>
     }
-
+    // console.log('result:', result)
     const authors = result.data.allAuthors
     console.log('authors:', authors)
 

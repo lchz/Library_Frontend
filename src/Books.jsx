@@ -4,23 +4,25 @@ import { styles } from "./styleSheet"
 
 
 const Book = ({book}) => {
+    // console.log('one book:', book)
     return (
         <>
             <div style={{...styles.gridItem, textAlign:"left"}}>{book.title}</div>
-            <div style={styles.gridItem}>{book.author}</div>
+            <div style={styles.gridItem}>{book.author.name}</div>
             <div style={styles.gridItem}>{book.published}</div>
         </>
     )
 }
 
 const Books = () => {
+    
     const result = useQuery(ALL_BOOKS)
+
     if (result.loading) {
         return <div>Loading...</div>
     }
 
     const books = result.data.allBooks
-    console.log('books:', books)
 
     return (
         <div>
