@@ -4,13 +4,14 @@ import {
 } from 'react-router-dom'
 import { useApolloClient } from '@apollo/client'
 import Authors from './Authors'
-import Books from './Books'
+import {Books} from './Books'
 import BookForm from './BookForm'
 import { useState } from 'react'
 import { useEffect } from 'react'
 import LoginForm from './LoginForm'
 
-import {jwtDecode} from 'jwt-decode'
+import Recommendation from './Recommendation'
+
 
 
 
@@ -28,6 +29,7 @@ function App() {
     }, 10000);
   }, [error, notice])
 
+
   const logout = () => {
     setToken(null)
     localStorage.clear()
@@ -35,19 +37,6 @@ function App() {
 
     setError('You are logged out')
   }
-
-  console.log('Token:', token)
-
-  // setTimeout(() => {
-  //   console.log('Checking token')
-  //   if(!token) {
-  //     console.log('Token expired')
-  //     setToken(null)
-  //     localStorage.clear()
-  //     client.resetStore()
-  
-  //   }
-  // }, 2000);
 
   return (
     <>
@@ -67,21 +56,24 @@ function App() {
           <Link to="/books" style={{padding:5}}>Books</Link>
           {token ?  <>
                       <Link to="/bookForm" style={{padding:5}}>Add book</Link> 
-                      <span >Logged in as {token.username}</span>
+                      {/* <span >Logged in as {token.username}</span> */}
+                      <Link to="/recommend" style={{padding:5}}>Recommend</Link>
                       <button onClick={logout}>Logout</button> 
                     </>
-                :  <Link to="/login" style={{padding:5}}>Login</Link> 
+                 :  
+                    <Link to="/login" style={{padding:5}}>Login</Link> 
           }
 
 
         </div>
 
         <Routes>
-          {!token && <Route path="/bookForm" element={<Navigate to="/" />} />}
+          { !token && <Route path="/bookForm" element={<Navigate to="/" />} /> }
           <Route path="/authors" element={<Authors setError={setError} />} />
           <Route path="/books" element={<Books />} />
           <Route path="/bookForm" element={<BookForm setError={setError} setNotice={setNotice} />} />
           <Route path='/login/*' element={<LoginForm setToken={setToken} setError={setError} setNotice={setNotice} />} /> 
+          <Route path='/recommend' element={<Recommendation token={token} setError={setError} />} />
           <Route path="/" element={<Books />} />
         </Routes>
 

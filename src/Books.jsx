@@ -4,7 +4,7 @@ import { styles } from "./styleSheet"
 import { useState } from "react"
 
 
-const Book = ({book}) => {
+export const Book = ({book}) => {
     // console.log('one book:', book)
     return (
         <>
@@ -15,12 +15,13 @@ const Book = ({book}) => {
     )
 }
 
-const Books = () => {
-    // console.log('books token:', localStorage.getItem('library-user-token'))
+
+export const Books = () => {
     const [genre, setGenre] = useState('')
 
     const result = useQuery(ALL_BOOKS, {
         variables: {genre: genre==='all' ? '' : genre},
+
         onError: (error) => {
             console.log('Books error:', error.message)
         }
@@ -71,4 +72,4 @@ const Books = () => {
     )
 }
 
-export default Books
+// export default Books

@@ -27,7 +27,7 @@ const BookForm = ({setError, setNotice}) => {
     const [newGenre, setNewGenre] = useState('')
 
     const [createBookQL, result] = useMutation(CREATE_BOOK, {
-        refetchQueries:  [{query:ALL_AUTHORS}, {query:ALL_BOOKS}],
+        // refetchQueries:  [{query:ALL_AUTHORS}, {query:ALL_BOOKS}],
         onError: (error) => {
             console.log('ERROR:', error.message)
             console.log('graphQLError:', error.graphQLErrors)
@@ -37,7 +37,14 @@ const BookForm = ({setError, setNotice}) => {
         },
         onCompleted: () => {
             setNotice('A new book added!')
-        }
+        },
+        update: (cache, response) => {
+            cache.updateQuery({query: ALL_BOOKS}, ({allBooks}) => {
+                return {
+                    allBooks: allBooks.concat(response.data.addBook)
+                }
+            })
+        },
     })
 
     // console.log('form result:', result)
@@ -70,7 +77,7 @@ const BookForm = ({setError, setNotice}) => {
 
     return (
         <div>
-            {result.data && <Navigate to="/" />}
+            { result.data && <Navigate to="/" /> }
 
             <h1>Add Book</h1>
             <form style={styles.gridContainer} onSubmit={addBook}>
