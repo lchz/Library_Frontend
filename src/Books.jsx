@@ -1,45 +1,36 @@
-import { useQuery } from "@apollo/client"
+import { useQuery, useLazyQuery } from "@apollo/client"
 import { ALL_BOOKS } from "./queries"
 import { styles } from "./styleSheet"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import Book from "./Book"
 
 
-export const Book = ({book}) => {
-    // console.log('one book:', book)
-    return (
-        <>
-            <div style={{...styles.gridItem, textAlign:"left"}}>{book.title}</div>
-            <div style={styles.gridItem}>{book.author.name}</div>
-            <div style={styles.gridItem}>{book.published}</div>
-        </>
-    )
-}
+const Books = ({setNotice, setError}) => {
 
-
-export const Books = () => {
-    const [genre, setGenre] = useState('')
+    const [genre, setGenre] = useState('all')
+    const [subbooks, setBooks] = useState([])
 
     const result = useQuery(ALL_BOOKS, {
-        variables: {genre: genre==='all' ? '' : genre},
-
         onError: (error) => {
             console.log('Books error:', error.message)
-        }
+            setError(error.message)
+        },
     })
 
-    const tempResult = useQuery(ALL_BOOKS)
+    const [getGerens, lazyResult] = useLazyQuery(ALL_BOOKS)
+    useEffect(() => {
+        getGerens({variables:{genre}}).then(r => setBooks(r.data.allBooks))
+    }, [genre])
 
-    if (result.loading || tempResult.loading) {
+
+    if (result.loading) {
         return <div>Loading...</div>
     }
 
+    const genreList = result.data.allBooks.flatMap(b => b.genres)
+    const genres = ['all', ...new Set(genreList)]
+
     const books = result.data.allBooks
-
-    const allBooks = tempResult.data.allBooks
-    const genreList = ["all", ...new Set( allBooks.flatMap(b => b.genres) ) ]
-
-    // console.log('list:', genreList)
-    console.log('seleted:', genre)
 
     return (
         <div>
@@ -47,29 +38,34 @@ export const Books = () => {
 
             <div>
                 in genre <span style={{fontWeight: 'bold'}}>
-                            {genre ? genre : 'all'}
+                            {genre}
                          </span>
             </div>
 
-            <div style={styles.gridContainer}>
+            <div style={{...styles.gridContainer, gridTemplateColumns:"auto auto auto auto"}}>
                 <div style={{}}></div>
                 <div style={{...styles.gridItem, fontWeight:"bold"}}>Author</div>
                 <div style={{...styles.gridItem, fontWeight:"bold"}}>Published</div>
+                <div style={{}}></div>
 
-                {
+                { genre === 'all' ?
                     books.map(book =>
-                        <Book key={book.id} book={book} />
+                        <Book key={book.id} book={book} setError={setError} setNotice={setNotice} />
+                    )
+                    :
+                    subbooks.map(book =>
+                        <Book key={book.id} book={book} setError={setError}  setNotice={setNotice} />
                     )
                 }
             </div>
 
             <div>
                 {
-                    genreList.map(g => <input key={g} type="button" value={g} onClick={({target}) => setGenre(target.value)} />)
+                    genres.map(g => <input key={g} type="button" value={g} onClick={({target}) => setGenre(target.value)} />)
                 }
             </div>
         </div>
     )
 }
 
-// export default Books
+export default Books

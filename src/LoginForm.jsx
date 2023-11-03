@@ -1,9 +1,8 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { LOGIN } from "./queries"
 import { useMutation } from "@apollo/client"
 // import { useEffect } from "react"
 import { Navigate } from 'react-router-dom'
-
 
 
 const LoginForm = ({ setToken, setError, setNotice}) => {
@@ -15,16 +14,17 @@ const LoginForm = ({ setToken, setError, setNotice}) => {
         onError: (error) => {
             setError(error.message)
         },
-        onCompleted: (data) => {
-            const token = data.login.value
+    })
+
+    useEffect(() => {
+        if (result.data) {
+            const token = result.data.login
             setToken(token)
-            localStorage.setItem('library-user-token', token)
+            localStorage.setItem('library-user-token', token.value)
 
             setNotice('Logged in successfully')
         }
-    })
-
-    // console.log('login result:', result)
+    }, [result.data])
 
     const submit = (event) => {
         event.preventDefault()

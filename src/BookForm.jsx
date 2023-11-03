@@ -27,10 +27,8 @@ const BookForm = ({setError, setNotice}) => {
     const [newGenre, setNewGenre] = useState('')
 
     const [createBookQL, result] = useMutation(CREATE_BOOK, {
-        // refetchQueries:  [{query:ALL_AUTHORS}, {query:ALL_BOOKS}],
+        refetchQueries: [ALL_BOOKS, ALL_AUTHORS ],
         onError: (error) => {
-            console.log('ERROR:', error.message)
-            console.log('graphQLError:', error.graphQLErrors)
             const msg = error.graphQLErrors.map(e => e.message).join('\n')
             msg.concat(`\n${error.message}`)
             setError(msg)
@@ -38,17 +36,9 @@ const BookForm = ({setError, setNotice}) => {
         onCompleted: () => {
             setNotice('A new book added!')
         },
-        update: (cache, response) => {
-            cache.updateQuery({query: ALL_BOOKS}, ({allBooks}) => {
-                return {
-                    allBooks: allBooks.concat(response.data.addBook)
-                }
-            })
-        },
     })
 
-    // console.log('form result:', result)
-    console.log('Genres:', genres)
+    // console.log('Genres:', genres)
 
     const addGenre = (event) => {
         event.preventDefault()
@@ -61,13 +51,15 @@ const BookForm = ({setError, setNotice}) => {
     
     const addBook = (event) => {
         event.preventDefault()
-        // console.log(title, author, published, genres)
         if (genres.length === 0) {
             setError('Add genres first')
             return
         }
 
-        createBookQL({variables: {title, authorName:author, published:parseInt(published), genres}})
+        createBookQL({
+            variables: {title, authorName:author, published:parseInt(published), genres},
+            refetchQueries:  [{query:ALL_BOOKS}, {query:ALL_AUTHORS}, ]
+        })
         
         setTitle('')
         setAuthor('')
