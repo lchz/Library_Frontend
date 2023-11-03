@@ -5,32 +5,62 @@ import { useEffect, useState } from "react"
 import Book from "./Book"
 
 
-const Books = ({setNotice, setError}) => {
+const Books = ({token, setNotice, setError}) => {
 
     const [genre, setGenre] = useState('all')
-    const [subbooks, setBooks] = useState([])
+    const [showBooks, setShowBooks] = useState([])
+    const [info, setInfo] = useState('')
 
-    const result = useQuery(ALL_BOOKS, {
+    const allBooksResult = useQuery(ALL_BOOKS, {
         onError: (error) => {
             console.log('Books error:', error.message)
             setError(error.message)
         },
+        onCompleted: (data) => {
+            console.log('D:', data)
+            setShowBooks(data.allBooks)
+        }
     })
 
-    const [getGerens, lazyResult] = useLazyQuery(ALL_BOOKS)
+    // useEffect(() => {
+    //     setNotice('Fetching book list!')
+    // }, [allBooksResult.result])
+
+    // Set genre
+    const [getGenres, lazyResult] = useLazyQuery(ALL_BOOKS)
     useEffect(() => {
-        getGerens({variables:{genre}}).then(r => setBooks(r.data.allBooks))
+        getGenres({variables:{genre}}).then(r => setShowBooks(r.data.allBooks))
     }, [genre])
 
 
-    if (result.loading) {
+    // Search Function
+    const [searching, searchResult] = useLazyQuery(ALL_BOOKS)
+
+    const search = (event) => {
+        event.preventDefault()
+        console.log('Searching:', info)
+
+        searching({variables: {title: info},
+            onError: (error) => {
+                console.log('Error in searching:', error.message)
+            },
+            onCompleted: (data) => {
+                console.log('Completed!')
+                console.log('Data:', data)
+                setShowBooks(data.allBooks)
+            }
+        })
+    }
+
+
+    if (allBooksResult.loading) {
         return <div>Loading...</div>
     }
 
-    const genreList = result.data.allBooks.flatMap(b => b.genres)
+    const genreList = allBooksResult.data.allBooks.flatMap(b => b.genres)
     const genres = ['all', ...new Set(genreList)]
 
-    const books = result.data.allBooks
+    // const books = result.data.allBooks
 
     return (
         <div>
@@ -38,17 +68,31 @@ const Books = ({setNotice, setError}) => {
 
             <div>
                 in genre <span style={{fontWeight: 'bold'}}>
-                            {genre}
+                            {genre === '' ? 'all' : genre}
                          </span>
             </div>
 
+            <form onSubmit={search}>
+                <input value={info} onChange={(e) => setInfo(e.target.value)} />
+                <button type="submit" >
+                    Search
+                </button>
+            </form>
+            {/* onClick={(event) => search(event)} */}
             <div style={{...styles.gridContainer, gridTemplateColumns:"auto auto auto auto"}}>
                 <div style={{}}></div>
                 <div style={{...styles.gridItem, fontWeight:"bold"}}>Author</div>
                 <div style={{...styles.gridItem, fontWeight:"bold"}}>Published</div>
                 <div style={{}}></div>
 
-                { genre === 'all' ?
+                {
+                    showBooks.map(book =>
+                        <Book key={book.id} book={book} token={token} setError={setError} setNotice={setNotice} />
+                    )
+                    
+                }
+
+                {/* { genre === 'all' ?
                     books.map(book =>
                         <Book key={book.id} book={book} setError={setError} setNotice={setNotice} />
                     )
@@ -56,12 +100,14 @@ const Books = ({setNotice, setError}) => {
                     subbooks.map(book =>
                         <Book key={book.id} book={book} setError={setError}  setNotice={setNotice} />
                     )
-                }
+                } */}
+
+
             </div>
 
             <div>
                 {
-                    genres.map(g => <input key={g} type="button" value={g} onClick={({target}) => setGenre(target.value)} />)
+                    genres.map(g => <input key={g} type="button" value={g} onClick={({target}) => setGenre(target.value==='all'?'':target.value)} />)
                 }
             </div>
         </div>

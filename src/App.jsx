@@ -36,6 +36,9 @@ function App() {
     setError('You are logged out')
   }
 
+  console.log('token:', token)
+  console.log('storage:', localStorage.getItem('library-user-token'))
+
   return (
     <>
       <BrowserRouter>
@@ -52,7 +55,9 @@ function App() {
           <Link to="/" style={{padding:5}}>Home</Link>
           <Link to="/authors" style={{padding:5}}>Authors</Link>
           <Link to="/books" style={{padding:5}}>Books</Link>
-          {localStorage.getItem('library-user-token') 
+          
+          {localStorage.getItem('library-user-token')
+          // {token
             ?  
               <>
                 <Link to="/bookForm" style={{padding:5}}>Add book</Link> 
@@ -67,9 +72,9 @@ function App() {
         </div>
 
         <Routes>
-          { !token && <Route path="/bookForm" element={<Navigate to="/" />} /> }
+          { !localStorage.getItem('library-user-token') && <Route path="/bookForm" element={<Navigate to="/" />} /> }
           <Route path="/authors" element={<Authors setError={setError} />} />
-          <Route path="/books" element={<Books setNotice={setNotice} setError={setError} />} />
+          <Route path="/books" element={<Books token={token} setNotice={setNotice} setError={setError} />} />
           <Route path="/bookForm" element={<BookForm setError={setError} setNotice={setNotice} />} />
           <Route path='/login/*' element={<LoginForm setToken={setToken} setError={setError} setNotice={setNotice} />} /> 
           <Route path='/recommend' element={<Recommendation token={token} setError={setError} setNotice={setNotice} />} />

@@ -1,11 +1,9 @@
-import { useMutation, useQuery } from "@apollo/client"
+import { useMutation } from "@apollo/client"
 import { ALL_AUTHORS, ALL_BOOKS, DELETE_BOOK } from "./queries"
 import { styles } from "./styleSheet"
-import { useEffect, useState } from "react"
-import { Navigate } from "react-router-dom"
 
 
-const Book = ({book, setError, setNotice}) => {
+const Book = ({book, token, setError, setNotice}) => {
 
     const [deleteBookQL, result] = useMutation(DELETE_BOOK, {
         refetchQueries: [{query: ALL_BOOKS}, {query: ALL_AUTHORS}],
@@ -13,13 +11,6 @@ const Book = ({book, setError, setNotice}) => {
             setError(error.message)
         },
     })
-
-    // useEffect(() => {
-    //     if (result.data) {
-    //         console.log('Deleted book:', result.data.deleteBook.title)
-    //         setNotice('Deleted book successfully')
-    //     }
-    // }, [result.data])
 
     const loggedIn = localStorage.getItem('library-user-token')
 
@@ -31,7 +22,9 @@ const Book = ({book, setError, setNotice}) => {
             { loggedIn ? 
                         <div>
                             <button style={{backgroundColor:'red', padding:5, }}
-                                    onClick={() => deleteBookQL({variables:{title: book.title}}).then(() => setNotice('Deleted!')) } >
+                                    onClick={() => deleteBookQL({variables:{title: book.title},
+                                                                    refetchQueries: [ALL_BOOKS, ALL_AUTHORS]}) } >
+                                                                        {/* .then(() => {setNotice('Book deleted successfully!')}) */}
                                 Delete
                             </button>
                         </div>
